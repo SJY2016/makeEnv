@@ -27,6 +27,8 @@ local itemUpdateFolder = {langKey = 'Refresh Directory'}
 
 local itemUpload = {langKey = 'UpLoad'}
 local itemDownload = {langKey = 'DownLoad'}
+local itemZipTo ={langKey = 'Zip To'}
+local itemUnzip = {langKey = 'Unzip From'}
 ---------------------------------------------------------------------------------------------
 
 local function init_rmenu(items)
@@ -38,7 +40,7 @@ local function init_rmenu(items)
 		record = lan
 		for k,v in ipairs(items) do 
 			if type(v) == 'table' then 
-				v.title =lang:get_id_name(v.langKey )  
+				v.title =lang:get_id_name(v.langKey ) or v.langKey
 			end
 		end
 		lang:close()
@@ -48,16 +50,16 @@ end
 
 local rootRmenu = {
 	itemNewFolder;
-	-- itemImportFolder;
-	-- '';
 	itemNewFile;
-	-- itemImportFiles;
 	'';
 	itemOpenFolder;
 	itemUpdateFolder;
 	'';
 	itemUpload;
 	itemDownload;
+	'';
+	itemZipTo;
+	itemUnzip;
 }
 
 local folderRmenu = {
@@ -116,6 +118,8 @@ itemOpenFile.action = function() action.open_file() end
 itemUpdateFolder.action = function() action.update_folder() end
 itemUpload.action = function() action.upload() end
 itemDownload.action = function() action.download() end
+itemZipTo.action = function() action.zip_to() end
+itemUnzip.action = function() action.unzip_from() end
 --[[
 itemImportFolder.action = function() action.import_folder() end
 itemImportFiles.action = function() action.import_files() end
