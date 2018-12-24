@@ -172,10 +172,15 @@ function dir_shear(src,dst)
 end
 
 --path = a/b/c/,src = d ,dst = e 
-function file_rename(path,srcName,dstName)
+function file_rename(path,srcName,dstName,move)
 	local src = path .. srcName
 	local dst = path .. dstName
-	return rename(src,dst)
+	if move then 
+		return file_shear(src,dst)
+	else 
+		return rename(src,dst)
+	end
+	
 end
 
 function dir_copy(src,dst)
