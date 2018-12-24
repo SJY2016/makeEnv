@@ -1,7 +1,4 @@
 env/*.dll
-*.bmp
-*.png
-*.jpg
 *.exe
 env/socket.lua
 env/mime.lua
@@ -11,4 +8,3 @@ env/login/
 env/res/
 env/service/
 env/socket/
-env/project/
