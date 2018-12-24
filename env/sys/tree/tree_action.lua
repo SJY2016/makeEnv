@@ -11,6 +11,7 @@ local dlgAdd = require 'sys.dlgs.dlg_add'
 local lfs = require 'lfs'
 local iup  = require 'sys.iup'
 local sysDisk = require 'sys.disk'
+local sysZip = require 'sys.zip'
 
 local open = io.open
 local print = print
@@ -18,6 +19,7 @@ local string = string
 local trace_out = trace_out
 
 _ENV = _M
+
 
 -----------------------------------------------------------------------------------------------
 local function add_folder(name)
@@ -33,7 +35,10 @@ local function add_folder(name)
 		iup.Message('Warning','Failed to add folder !')
 		return
 	end
-	return sysTreeFrame.add_folder(name)
+	-- return sysTreeFrame.add_folder(name)
+	local pid = objTree:get_id()
+	update_folder(pid)
+	objTree:set_markedId(objTree:get_childTitleId(name,pid))
 end
 
 local function add_file(name)
@@ -49,7 +54,11 @@ local function add_file(name)
 		return iup.Message('Warning','Failed to add file !') 
 	end
 	f:close()
-	return sysTreeFrame.add_file(name)
+		-- return sysTreeFrame.add_file(name)
+	local pid = objTree:get_id()
+	update_folder(pid)
+	objTree:set_markedId(objTree:get_childTitleId(name,pid))
+
 end
 
 function new_folder()
@@ -80,8 +89,7 @@ local function rename_folder(path,oldId,newName,oldName)
 		return
 	end
 	local pid = objTree:get_parentId(oldId)
-	sysTreeFrame.init_folderDat(path,pid)
-	objTree:set_stateId('EXPANDED',pid)
+	update_folder(pid)
 	objTree:set_markedId(objTree:get_childTitleId(newName,pid))
 end
 
@@ -98,9 +106,9 @@ local function rename_file(path,oldId,newName,oldName)
 		return 
 	end
 	local pid = objTree:get_parentId(oldId)
-	sysTreeFrame.init_folderDat(path,pid)
-	objTree:set_stateId('EXPANDED',pid)
+	update_folder(pid)
 	objTree:set_markedId(objTree:get_childTitleId(newName,pid))
+	
 end
 
 -----------------------------------------------------------------------------------------------
@@ -180,14 +188,13 @@ function open_file()
 	sysDisk.file_open(file)
 end
 
-function update_folder()
+function update_folder(id)
 	local objTree = sysTreeFrame.get_treeObj()
-	local id = objTree:get_id()
+	local id = id or objTree:get_id()
 	local state = objTree:get_stateId(id)
 	local path = objTree:get_treePath(id)
 	sysTreeFrame.init_folderDat(path,id)
 	objTree:set_stateId(state,id)
-	
 end
 
 ------------------------------------------------------------------
@@ -198,4 +205,18 @@ end
 
 function download()
 	trace_out('download \n')
+end
+
+function zip_to()
+	local filename = 'zips/test.zip'
+	local path = 'Project/'
+	sysZip.zip(filename,path)
+end
+
+function unzip_from()
+	local filename = 'zips/test.zip'
+	local path = 'Project/'
+	lfs.mkdir(path)
+	sysZip.unzip(filename,path)
+	update_folder(0)
 end
