@@ -147,33 +147,33 @@ local function get_addPos(name,addType)
 	-- return objTree:insert_branchId(name,last.id)
 end
 
-function add_folder(name)
-	local objTree = get_treeObj()
-	local id = objTree:get_id()
-	local lastId =  get_addPos(name,'BRANCH')
-	local newId;
-	if id == lastId then 
-		newId = objTree:add_branchId(name,lastId)
-	else 
-		newId = objTree:insert_branchId(name,lastId)
-	end
-	objTree:set_markedId(newId)
-	return newId
-end
+-- function add_folder(name)
+	-- local objTree = get_treeObj()
+	-- local id = objTree:get_id()
+	-- local lastId =  get_addPos(name,'BRANCH')
+	-- local newId;
+	-- if id == lastId then 
+		-- newId = objTree:add_branchId(name,lastId)
+	-- else 
+		-- newId = objTree:insert_branchId(name,lastId)
+	-- end
+	-- objTree:set_markedId(newId)
+	-- return newId
+-- end
 
-function add_file(name)
-	local objTree = get_treeObj()
-	local id = objTree:get_id()
-	local lastId =  get_addPos(name,'LEAF')
-	local newId;
-	if id == lastId then 
-		newId = objTree:add_leafId(name,lastId)
-	else 
-		newId =  objTree:insert_leafId(name,lastId)
-	end
-	objTree:set_markedId(newId)
-	objTree:update_nodeStyle(newId)
-end
+-- function add_file(name)
+	-- local objTree = get_treeObj()
+	-- local id = objTree:get_id()
+	-- local lastId =  get_addPos(name,'LEAF')
+	-- local newId;
+	-- if id == lastId then 
+		-- newId = objTree:add_leafId(name,lastId)
+	-- else 
+		-- newId =  objTree:insert_leafId(name,lastId)
+	-- end
+	-- objTree:set_markedId(newId)
+	-- objTree:update_nodeStyle(newId)
+-- end
 
 
 
