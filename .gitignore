@@ -12,3 +12,4 @@ env/res/
 env/service/
 env/socket/
 env/project/
+*.zip
