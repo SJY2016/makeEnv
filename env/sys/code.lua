@@ -1,8 +1,9 @@
 
+
+local _M = {}
 local modname = ...
-local M = {}
-_G[modname] = M
-package.loaded[modname] = M
+_G[modname] = _M
+package.loaded[modname] = _M
 
 
 local string = string
@@ -17,7 +18,7 @@ local table = table
 local print = print
 local ipairs = ipairs
 
-_ENV = M
+_ENV = _M
 
 local sort_;
 local cur_;
@@ -262,11 +263,11 @@ local getmetatable = getmetatable
 local setmetatable = setmetatable
 local rawget = rawget
 
-local M = {}
+local _M = {}
 local modname = ...
-_G[modname] = M
-package.loaded[modname] = M
-_ENV = M
+_G[modname] = _M
+package.loaded[modname] = _M
+_ENV = _M
 
 local function basicSerialize(o,saved)
 	if type(o) == "number" then
