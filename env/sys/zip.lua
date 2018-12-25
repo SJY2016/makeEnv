@@ -554,9 +554,9 @@ function unzip(zipfile,path,recordFile)
 	if string.find(path,'/') then 
 		curPath	= string.match(path , '(.+)/')
 	end
-	if lfs.attributes(curPath,'mode') ~= 'directory' then
-		return 
-	end
+	-- if lfs.attributes(curPath,'mode') ~= 'directory' then
+		-- return 
+	-- end
 	local tempPath = curPath.. '.temp/'
 	if lfs.attributes(tempPath,'mode') == 'directory' then
 		DISK.dir_delete(tempPath) 
@@ -585,7 +585,8 @@ function unzip(zipfile,path,recordFile)
 		-- DISK.dir_delete(tempPath)
 	-- end
 	
-	return record_lastUnzip(recordFile,record,path ~= '.' and path or '',tempPath)
+	 record_lastUnzip(recordFile,record,path ~= '.' and path or '',tempPath)
+	 
 end
 
 
@@ -610,7 +611,9 @@ end
 --准备做个通用的 压缩 解压缩 界面管理 期间的过程和意外情况
 --path = 'a/b/' or ''
 record_lastUnzip = function(file,dat,path,tempPath)
+	
 	local oldDat = DISK.file_read(file)
+	print('record_lastUnzip',file)
 	if oldDat then  
 		local dirs = {}
 		local diskFile ;
