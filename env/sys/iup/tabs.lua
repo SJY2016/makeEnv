@@ -139,7 +139,7 @@ end
 --获得tab页的个数
 function Class:get_count()
 	local control = self:get_control()
-	return control.COUNT
+	return control.COUNT and tonumber(control.COUNT)
 end
 
 --根据页所在的位置切换当前页
