@@ -46,8 +46,11 @@ local modname = ...
 _G[modname] = _M
 package.loaded[modname] = _M
 
-local rpath,path = require 'sys.tools'.get_path(modname)
-local sysDisk = require (rpath .. 'disk')
+local sysTools = TOOLS
+local rpath,path = sysTools.get_path(modname)
+local sysDisk = DISK
+local sysSetting = _G.SETTING
+
 local lfs = require 'lfs'
 
 
@@ -68,9 +71,9 @@ local table = table
 
 _ENV = _M
 
-local objPlugin = classPlugin:new()
-local confPath = 'config/plugins/'
-local fileUser = confPath .. 'keywords.lua'
+-- local objPlugin = classPlugin:new()
+-- local confPath = 'config/plugins/'
+-- local fileUser = confPath .. 'keywords.lua'
 
 
 --------------------------------------------------
@@ -108,11 +111,12 @@ end
 		...;
 	}	
 --]]
+--[[
 init_db = function()
 	local db;
 	return function()
 		db = sysDisk.file_read(fileUser) or {}
-		update_keywordDat()
+		-- update_keywordDat()
 		return db
 	end,function()
 		return db or update_db()
@@ -123,44 +127,17 @@ init_db = function()
 end
 
 update_db,get_db,save_db = init_db()
+--]]
 --------------------------------------------------
 --注意keywordDat数据一部分是来自于文件中（插件部分，key值对应的是true），一部分来自系统加载app得到的（key值对应的是数据表）。
 
-local function get_iconFile(tab,key)
-	--查找插件目录下的文件
-	local curFile = objPlugin:get_installedPluginPath() .. tab[key]
-	if  sysDisk.file_exist(curFile) then 
-		return curFile
-	end
-	--查找系统路径
-	curFile =tab[key]
-	if  sysDisk.file_exist(curFile) then 
-		return curFile
-	end
-	return tab[key]
-end
-
-local function deepcopy(tab,newTab)
-	if type(tab) ~= 'table' then return {} end 
-	local newTab = newTab or {}
-	for k,v in pairs(tab) do 
-		if type(v) ~= 'table' then 
-			newTab[k] = v
-		else 
-			newTab[k] = {}
-			deepcopy(v,newTab[k])
-		end
-	end
-	return newTab
-end
 
 
 init_keywordDat = function()
 	local keywordDat;
-	return function()
+	return function(dat)
 		keywordDat  = keywordDat or {}
-		local db = get_db()
-		db = deepcopy(db)
+		db = sysTools.deepcopy(dat)
 		for k,keyDat in pairs(db) do 
 			keywordDat[k] = {}
 			setmetatable(keywordDat[k],
@@ -173,20 +150,20 @@ init_keywordDat = function()
 							local modFun;
 							if string.find(cur.value,'%.') then 
 								local fileName,funName =string.match(cur.value,'(.+)%.'),string.match(cur.value,'.+%.([^%.]+)')
-								local file = objPlugin:get_installedPluginPath(tab.plugin) .. fileName .. '.lua'
+								local file = fileName .. '.lua'
 								local mod = sysDisk.file_require(file)
 								if mod and mod[funName] then 
 									modFun = mod[funName]
 								end
 							elseif cur.file then 
-								local file = objPlugin:get_installedPluginPath(tab.plugin) .. cur.file
+								local file = cur.file
 								local mod = sysDisk.file_require(file)
 								if mod and mod[cur.value] then 
 									modFun = mod[cur.value]
 								end
 								
 							elseif tab.file then 
-								local file = objPlugin:get_installedPluginPath(tab.plugin) .. tab.file
+								local file = tab.file
 								local mod = sysDisk.file_require(file)
 								if mod and mod[cur.value] then 
 									modFun = mod[cur.value]
@@ -208,7 +185,7 @@ init_keywordDat = function()
 		end	
 		return keywordDat
 	end,function(self,dat,delete)
-		if not keywordDat then update_keywordDat() end
+		if not keywordDat then return  end
 		if not dat.keyword then return end 
 		if delete then 
 			keywordDat[dat.keyword] = nil
@@ -217,15 +194,18 @@ init_keywordDat = function()
 		end
 		return 
 	end,function(self,key)
-		if not keywordDat then update_keywordDat() end
+		if not keywordDat then return end
 		if not key then return end
 		return type(keywordDat[key]) == 'table' and keywordDat[key]
 	end,function(self)
-		if not keywordDat then update_keywordDat() end
+		if not keywordDat then return end
 		return keywordDat
 	end
 end
 
 update_keywordDat,Keyword.add_keyword,Keyword.get_keywordDat,Keyword.get_all = init_keywordDat()
+
+sysSetting.reg_cbf('keyword',update_keywordDat)
+--]]
 --------------------------------------------------
 
