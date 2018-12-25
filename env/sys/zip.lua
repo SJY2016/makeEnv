@@ -416,7 +416,7 @@ package.loaded[modname] = _M
 
 local luazip = require"luazip"
 local lfs = require 'lfs'
-local sysDisk = require 'sys.disk'
+local DISK = DISK
 
 local next = next
 local remove = os.remove
@@ -427,6 +427,10 @@ local type = type
 local assert = assert
 local rename = os.rename
 local open = io.open
+local iup = IUP
+local pairs = pairs
+local ipairs = ipairs
+local table = table
 
 _ENV = _M
 
@@ -517,7 +521,7 @@ end
 function zip(zipFile,path)
 	assert(type(zipFile) == 'string' )
 	local temp = zipFile .. '.temp'
-	sysDisk.file_delete(temp)
+	DISK.file_delete(temp)
 	create(temp)
 	local function loop_dir(curPath,zipPath)
 		for line in lfs.dir(curPath) do 
@@ -536,22 +540,26 @@ function zip(zipFile,path)
 	loop_dir(path,'')
 	close()
 	local zipFilePath,zipFileName = string.match(zipFile,'(.+/?)[^/]+'), string.match(zipFile,'.+/?([^/]+)')
-	sysDisk.file_rename(zipFilePath,zipFileName .. '.temp',zipFileName,true)
+	DISK.file_rename(zipFilePath,zipFileName .. '.temp',zipFileName,true)
 end
 
  --zipfile：是要解压的文件，path是目标路径
- --path = 'c:/a/b/' or "a/b/"
+ --path = 'c:/a/b/' or "a/b/" or '.'
 --zipFile = 'a/b/filename.apc' --注意文件路径不能出现非常规字符
  --确保目标文件夹存在
-function unzip(zipfile,path)
-	
-	local curPath = string.match(path , '(.+)/')
+ --record 记录加压后文件信息
+function unzip(zipfile,path,recordFile)
+	local record =  {}
+	local curPath = path
+	if string.find(path,'/') then 
+		curPath	= string.match(path , '(.+)/')
+	end
 	if lfs.attributes(curPath,'mode') ~= 'directory' then
 		return 
 	end
 	local tempPath = curPath.. '.temp/'
 	if lfs.attributes(tempPath,'mode') == 'directory' then
-		sysDisk.dir_delete(tempPath) 
+		DISK.dir_delete(tempPath) 
 	end 
 	lfs.mkdir(tempPath)
 	create(zipfile)
@@ -560,6 +568,7 @@ function unzip(zipfile,path)
 	if nums ~= 0 then 
 		for id = 1,nums do 
 			fileInZip = get_index_file(id)
+			record[string.lower(fileInZip)] = fileInZip
 			if string.sub(fileInZip,-1,-1) == '/' then 
 				lfs.mkdir(tempPath .. fileInZip)
 			else 
@@ -568,9 +577,15 @@ function unzip(zipfile,path)
 		end
 	end
 	close()
-	sysDisk.dir_delete(path) 
-	rename(string.match(tempPath,'(.+)/'),string.match(path,'(.+)/'))
+	-- if path ~= '.' then 
+		-- DISK.dir_delete(path)
+		-- rename(string.match(tempPath,'(.+)/'),path == '.' and path or string.match(path,'(.+)/') )
+	-- else 
+		-- DISK.dir_copy(tempPath,path)
+		-- DISK.dir_delete(tempPath)
+	-- end
 	
+	return record_lastUnzip(recordFile,record,path ~= '.' and path or '',tempPath)
 end
 
 
@@ -590,4 +605,64 @@ function unzip_file(fileIndex,diskPath)
 		file:close() 
 		return true
 	end 
+end
+
+--准备做个通用的 压缩 解压缩 界面管理 期间的过程和意外情况
+--path = 'a/b/' or ''
+record_lastUnzip = function(file,dat,path,tempPath)
+	local oldDat = DISK.file_read(file)
+	if oldDat then  
+		local dirs = {}
+		local diskFile ;
+		for file in ipairs(oldDat) do 
+			diskFile = path .. file
+			if dat[file] and string.sub(file,-1,-1) == '/'  then 
+			elseif dat[file]  then
+			elseif not dat[file] and string.sub(file,-1,-1) == '/'  then
+				dirs[#dirs+1] = diskFile
+			elseif not dat[file]   then
+				if lfs.attributes(diskFile) then 
+					DISK.file_delete(diskFile)					
+				end				
+			end
+		end
+		
+		if #dirs > 0 then 
+			for _,dir in ipairs(dirs) do 
+				if DISK.get_childCount() == 0  then 
+					DISK.dir_delete(dir)
+				end
+			end
+		end
+	end
+	
+	local saveDat = {}
+	local copyDat = {}
+	for file,copyFile in pairs(dat) do 
+		saveDat[#saveDat+1] = file
+		copyDat[#copyDat+1] = {name = file,file = copyFile}
+	end
+	table.sort(saveDat,function(a,b)
+		return a > b
+	end)
+	
+	DISK.file_save(file,saveDat)
+	table.sort(copyDat,function(a,b)
+		return a.name < b.name
+	end)
+	
+	if path   ~= '' then 
+		lfs.mkdir(path)
+	end
+	local file;
+	for _,v in ipairs(copyDat) do 
+		file = v.file
+		if string.sub(file,-1,-1) == '/' then 
+			lfs.mkdir(path .. file)
+		else 
+			DISK.file_copy(tempPath .. file,path .. file)
+		end
+	end
+	DISK.dir_delete(tempPath)
+	return true
 end
