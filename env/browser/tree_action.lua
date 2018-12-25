@@ -189,10 +189,10 @@ function open_file()
 	DISK.file_open(file)
 end
 
-function update_folder(id)
+function update_folder(id,state)
 	local objTree = sysTreeFrame.get_treeObj()
 	local id = id or objTree:get_id()
-	local state = objTree:get_stateId(id)
+	local state = state or objTree:get_stateId(id)
 	local path = objTree:get_treePath(id)
 	sysTreeFrame.init_folderDat(path,id)
 	objTree:set_stateId(state,id)
@@ -219,7 +219,7 @@ function unzip_from()
 	local filename = 'zips/test.zip'
 	local path = 'Project/'
 	sysZip.unzip(filename,path,recordProjectFile)
-	update_folder(0)
+	update_folder(0,'EXPANDED')
 end
 
 local recordFile = 'config/unzip_record.lua'
