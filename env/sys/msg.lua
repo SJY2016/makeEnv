@@ -1,110 +1,87 @@
+local _M = {}
+local modname = ...
+_G[modname] = _M
+package.loaded[modname] = _M
 
-FRMCLOSE = require 'sys.frmclose'
-function create_dlgtree()
+local rpath,path = require 'sys.tools'.get_path(modname)
+
+local setmetatable = setmetatable
+local ipairs = ipairs
+local type = type
+local print = print
+local table = table
+local trace_out = trace_out
+
+_ENV = _M
+
+
+local sysCbfs = {}
+
+
+function init()
+	sysCbfs = {}
 end
 
-function frm_on_command(id)
+
+--add msg
+function add(cbfType,cbf)
+	sysCbfs[cbfType] = sysCbfs[cbfType] or {}
+	if not sysCbfs[cbfType][cbf] then 
+		sysCbfs[cbfType][cbf]  = true
+		sysCbfs[cbfType][#sysCbfs[cbfType]+1] = cbf
+	end
+end
+
+--reset msg
+function reset(cbfType,oldCbf,newCbf)
+	sysCbfs[cbfType] = sysCbfs[cbfType] or {}
+	local funs = sysCbfs[cbfType] 
+	if funs[oldCbf] then 
+		for k,v in ipairs(funs) do 
+			if v == oldCbf then 
+				funs[k] = newCbf
+				funs[oldCbf] = nil
+				funs[newCbf] = true
+				return 
+			end
+		end
+	end
+	funs[#funs+1] = newCbf
+	funs[newCbf] = true
+end
+
+--run msg
+function run(cbfType,...)
+	local funs = sysCbfs[cbfType]
+	if funs then 
+		for k,fun in ipairs(funs) do 
+			if fun(...) then return end 
+		end
+	end
+end
+
+--stop msg
+function stop(cbfType)
 	
 end
-function frm_on_command(id)
-	
+
+--delete msg
+function delete(cbfType,fun)
+	local funs = sysCbfs[cbfType] or {}
+	if funs[fun] then 
+		for k,v in ipairs(funs) do 
+			if v == fun then 
+				table.remove(funs,k)
+				funs[fun] = nil
+				return 
+			end
+		end
+	end
 end
 
-function on_command(id,scene)
-	
-end
-function on_command(id,sc)
-	
+--get reg funs
+function get(cbfType)
+	return sysCbfs[cbfType]
 end
 
-function on_timer(scene,id)
-
-end
-
-function on_paint(scene)
-
-end
-
-function render_objs(scene,mode)
-
-end
-
-function render_drags(scene)
-
-end
-
-function free_scene(scene)
-
-end
-
-function begin_select()
-
-end
-
-function select_main(index)
-
-end
-
-function end_select()
-
-end
-
-function on_mousewheel(scene,delta,x,y)
-	
-end
-function on_mousemove(scene,flags,x,y)
-
-end
-function on_lbuttondown(scene,flags,x,y)
-
-end
-function on_lbuttonup(scene,flags,x,y)
-
-end
-function on_lbuttondblclk(scene,flags,x,y)
-
-end
-function on_mbuttondown(scene,flags,x,y)
-
-end
-function on_mbuttonup(scene,flags,x,y)
-
-end
-function on_mbuttondblclk(scene,flags,x,y)
-
-end
-function on_rbuttondown(scene,flags,x,y)
-
-end
-function on_rbuttonup(scene,flags,x,y)
-
-end
-function on_rbuttondblclk(scene,flags,x,y)
-
-end
-
-function on_keydown(scene,key)
-
-end
-
-function scene_onsize(scene,cx,cy)
-end
-
-function onidle()
-
-end
-
-function onchat(send,msg)
-end
-
-function frmclose()
-	FRMCLOSE.call()
-	iup.Close()
-end
-
-function on_gcad_msg(cmd,sc)
-end
-
-
-
-
+----------------------------------------------------------------------
