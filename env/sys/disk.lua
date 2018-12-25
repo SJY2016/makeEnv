@@ -5,6 +5,8 @@ local modname = ...
 _G[modname] = _M
 package.loaded[modname] = _M
 
+local CODE  =  require 'sys.code'
+
 local lfs = require 'lfs'
 local require =require
 
@@ -314,4 +316,8 @@ function read_dir(path,total,dat)
 		end
 	end
 	return dat
+end
+
+function get_childCount(folder)
+	return #read_dir(folder)
 end
