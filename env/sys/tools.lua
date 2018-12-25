@@ -42,6 +42,7 @@ local type = type
 local print = print
 local require = require
 local string = string
+local pairs = pairs
 
 _ENV = _M
 
@@ -88,4 +89,18 @@ end
 
 function get_guid()
 	return luaext.guid()
+end
+
+function deepcopy(tab,newTab)
+	if type(tab) ~= 'table' then return {} end 
+	local newTab = newTab or {}
+	for k,v in pairs(tab) do 
+		if type(v) ~= 'table' then 
+			newTab[k] = v
+		else 
+			newTab[k] = {}
+			deepcopy(v,newTab[k])
+		end
+	end
+	return newTab
 end
