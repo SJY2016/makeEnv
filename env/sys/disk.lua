@@ -16,6 +16,7 @@ local error =error
 local print = print
 local execute = os.execute
 local remove = os.remove
+local exit = os.exit
 local loadfile = loadfile
 local open = io.open
 local ipairs = ipairs
@@ -320,4 +321,9 @@ end
 
 function get_childCount(folder)
 	return #read_dir(folder)
+end
+
+---------------------------------------------------------------------------
+function quit()
+	exit()
 end

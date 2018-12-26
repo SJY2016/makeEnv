@@ -209,22 +209,32 @@ function download()
 end
 
 function zip_to()
-	local filename = 'zips/test.zip'
+	local filename = 'zips/MakeApacd.zip'
 	local path = 'Project/'
 	sysZip.zip(filename,path)
 end
 
-local recordProjectFile = 'config/unzip_projectRecord.lua'
+
 function unzip_from()
-	local filename = 'zips/test.zip'
+	local recordProjectFile = 'config/unzip_projectRecord.lua'
+	local filename = 'zips/MakeApacd.zip'
 	local path = 'Project/'
 	sysZip.unzip(filename,path,recordProjectFile)
 	update_folder(0,'EXPANDED')
 end
 
-local recordFile = 'config/unzip_record.lua'
+
 function unzip_toApcad()
-	local filename = 'zips/test.zip'
+	local recordFile = 'apcad/config/unzip_record.lua'
+	local filename = 'zips/MakeApacd.zip'
+	local path = 'apcad/'
+	sysZip.unzip(filename,path,recordFile)
+end
+
+
+function unzip_toCur()
+	local recordFile = 'config/unzip_record.lua'
+	local filename = 'zips/MakeApacd.zip'
 	local path = '.'
 	sysZip.unzip(filename,path,recordFile)
 end

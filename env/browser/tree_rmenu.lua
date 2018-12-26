@@ -28,6 +28,7 @@ local itemUpload = {langKey = 'UpLoad'}
 local itemDownload = {langKey = 'DownLoad'}
 local itemZipTo ={langKey = 'Zip To'}
 local itemUnzip = {langKey = 'Unzip to project'}
+local itemUnzipToCur = {langKey = 'Unzip to cur'}
 local itemUnzipToApcad = {langKey = 'Unzip to apcad'}
 ---------------------------------------------------------------------------------------------
 
@@ -60,6 +61,8 @@ local rootRmenu = {
 	'';
 	itemZipTo;
 	itemUnzip;
+	'';
+	itemUnzipToCur;
 	itemUnzipToApcad;
 }
 
@@ -122,6 +125,7 @@ itemDownload.action = function() action.download() end
 itemZipTo.action = function() action.zip_to() end
 itemUnzip.action = function() action.unzip_from() end
 itemUnzipToApcad.action = function() action.unzip_toApcad() end
+itemUnzipToCur.action = function() action.unzip_toCur() end
 --[[
 itemImportFolder.action = function() action.import_folder() end
 itemImportFiles.action = function() action.import_files() end
