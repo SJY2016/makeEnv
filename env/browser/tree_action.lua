@@ -9,6 +9,7 @@ local rpath,path = sysTools.get_path(modname)
 local sysTreeFrame = require (rpath .. 'tree_frame')
 local dlgAdd = require (rpath .. 'dlgs.dlg_add') 
 local lfs = require 'lfs'
+local execute = os.execute
 
 local iup  = IUP
 local DISK = DISK
@@ -237,4 +238,5 @@ function unzip_toCur()
 	local filename = 'zips/MakeApacd.zip'
 	local path = '.'
 	sysZip.unzip(filename,path,recordFile)
+	DISK.restart( 'gcad.exe')
 end
