@@ -6,7 +6,6 @@ _G[modname] = _M
 package.loaded[modname] = _M
 
 local CODE  =  require 'sys.code'
-
 local lfs = require 'lfs'
 local require =require
 
@@ -326,4 +325,14 @@ end
 ---------------------------------------------------------------------------
 function quit()
 	exit()
+end
+
+function start(file)
+	file = string.gsub(file,'/','\\')
+	execute('start " " "'..file..'"\n');
+end
+
+function restart(file)
+	start(file)
+	quit()
 end
