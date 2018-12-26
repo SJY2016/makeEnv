@@ -46,13 +46,10 @@ local modname = ...
 _G[modname] = _M
 package.loaded[modname] = _M
 
-local sysTools = TOOLS
-local rpath,path = sysTools.get_path(modname)
-local sysDisk = DISK
-local sysSetting = _G.SETTING
-
+local sysTools = require 'sys.tools'
+local sysDisk = require 'sys.disk'
+local sysSetting = require 'sys.setting'
 local lfs = require 'lfs'
-
 
 local setmetatable = setmetatable
 local type =type
@@ -71,141 +68,70 @@ local table = table
 
 _ENV = _M
 
--- local objPlugin = classPlugin:new()
--- local confPath = 'config/plugins/'
--- local fileUser = confPath .. 'keywords.lua'
-
-
---------------------------------------------------
-
-local init_db;
-local update_db;
-local get_db;
-local save_db;
-
 local init_keywordDat;
-local update_keywordDat;
-
-
+local keywordDat;
 --------------------------------------------------
 
-local Keyword = {} 
-Class = Keyword
-
-function Keyword:new(t)
-	t = t or {}
-	setmetatable(t,self)
-	self.__index = self
-	return t
-end
 
 
---self:get_all;
---self:get_keywordDat
---self:add_keyword;
-
---------------------------------------------------
---[[
-	db = {
-		key1 = {pluginName = ,action = '文件 +.函数名' 或者'函数名' + file属性,file = '',}
-		...;
-	}	
---]]
---[[
-init_db = function()
-	local db;
-	return function()
-		db = sysDisk.file_read(fileUser) or {}
-		-- update_keywordDat()
-		return db
-	end,function()
-		return db or update_db()
-	end,function(db)
-		sysDisk.file_save(fileUser,db)
-		update_db()
-	end
-end
-
-update_db,get_db,save_db = init_db()
---]]
---------------------------------------------------
---注意keywordDat数据一部分是来自于文件中（插件部分，key值对应的是true），一部分来自系统加载app得到的（key值对应的是数据表）。
-
-
-
-init_keywordDat = function()
-	local keywordDat;
-	return function(dat)
-		keywordDat  = keywordDat or {}
-		db = sysTools.deepcopy(dat)
-		for k,keyDat in pairs(db) do 
-			keywordDat[k] = {}
-			setmetatable(keywordDat[k],
-				{
-					__index = function(tab,key)
-						local cur = keyDat[key]
-						if not cur then return end 
-						if type(cur) == 'table' and cur.type == 'function' then 	
-							local tab = keyDat;
-							local modFun;
-							if string.find(cur.value,'%.') then 
-								local fileName,funName =string.match(cur.value,'(.+)%.'),string.match(cur.value,'.+%.([^%.]+)')
-								local file = fileName .. '.lua'
-								local mod = sysDisk.file_require(file)
-								if mod and mod[funName] then 
-									modFun = mod[funName]
-								end
-							elseif cur.file then 
-								local file = cur.file
-								local mod = sysDisk.file_require(file)
-								if mod and mod[cur.value] then 
-									modFun = mod[cur.value]
-								end
-								
-							elseif tab.file then 
-								local file = tab.file
-								local mod = sysDisk.file_require(file)
-								if mod and mod[cur.value] then 
-									modFun = mod[cur.value]
-								end
+init_keywordDat =  function(dat)
+	keywordDat  = keywordDat or {}
+	db = sysTools.deepcopy(dat)
+	for k,keyDat in pairs(db) do 
+		keywordDat[k] = {}
+		setmetatable(keywordDat[k],
+			{
+				__index = function(tab,key)
+					local cur = keyDat[key]
+					if not cur then return end 
+					if type(cur) == 'table' and cur.type == 'function' then 	
+						local tab = keyDat;
+						local modFun;
+						if string.find(cur.value,'%.') then 
+							local fileName,funName =string.match(cur.value,'(.+)%.'),string.match(cur.value,'.+%.([^%.]+)')
+							local file = fileName .. '.lua'
+							local mod = sysDisk.file_require(file)
+							if mod and mod[funName] then 
+								modFun = mod[funName]
 							end
-							if cur.exe and modFun then 
-								keyDat[key] =modFun()
-							elseif modFun then 
-								keyDat[key] =modFun
-							else 
-								keyDat[key] = function() error('Fuction Missing !') end
+						elseif cur.file then 
+							local file = cur.file
+							local mod = sysDisk.file_require(file)
+							if mod and mod[cur.value] then 
+								modFun = mod[cur.value]
 							end
-							return keyDat[key] 
+							
+						elseif tab.file then 
+							local file = tab.file
+							local mod = sysDisk.file_require(file)
+							if mod and mod[cur.value] then 
+								modFun = mod[cur.value]
+							end
 						end
-						return cur
+						if cur.exe and modFun then 
+							keyDat[key] =modFun()
+						elseif modFun then 
+							keyDat[key] =modFun
+						else 
+							keyDat[key] = function() error('Fuction Missing !') end
+						end
+						return keyDat[key] 
 					end
-				}
-			)
-		end	
-		return keywordDat
-	end,function(self,dat,delete)
-		if not keywordDat then return  end
-		if not dat.keyword then return end 
-		if delete then 
-			keywordDat[dat.keyword] = nil
-		else 
-			keywordDat[dat.keyword] = dat
-		end
-		return 
-	end,function(self,key)
-		if not keywordDat then return end
-		if not key then return end
-		return type(keywordDat[key]) == 'table' and keywordDat[key]
-	end,function(self)
-		if not keywordDat then return end
-		return keywordDat
-	end
+					return cur
+				end
+			}
+		)
+	end	
 end
 
-update_keywordDat,Keyword.add_keyword,Keyword.get_keywordDat,Keyword.get_all = init_keywordDat()
+get_keywordDat  = function(key)
+	if not keywordDat then return end
+	if not key then return end
+	return type(keywordDat[key]) == 'table' and keywordDat[key]
+end
 
-sysSetting.reg_cbf('keyword',update_keywordDat)
+
+sysSetting.reg_cbf('keyword',init_keywordDat)
 --]]
 --------------------------------------------------
 

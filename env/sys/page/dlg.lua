@@ -22,7 +22,7 @@ package.loaded[modname] = _M
 
 local dlgClass_ = require 'sys.iup.dlg'
 local tabsClass_ = require 'sys.iup.tabs'
-local classKeyword = require 'sys.keyword'.Class
+local sysKeyword = require 'sys.keyword'
 
 local msgFrmclose = require 'sys.msg.frmclose'
 
@@ -40,7 +40,6 @@ local setmetatable = setmetatable
 
 _ENV = _M
 
-local objKeyword = classKeyword:new()
 
 local dlgCloseStatus;
 local isShow;
@@ -245,7 +244,7 @@ local add_page,remove_page = init_pluginTabs()
 function init_pages(dat)
 	for key,val in ipairs(dat) do 
 		if type(val) == 'table' and val.keyword then 
-			add_page(val,objKeyword:get_keywordDat(val.keyword) )
+			add_page(val,sysKeyword.get_keywordDat(val.keyword) )
 		end
 	end
 end

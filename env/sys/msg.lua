@@ -3,8 +3,6 @@ local modname = ...
 _G[modname] = _M
 package.loaded[modname] = _M
 
-local rpath,path = require 'sys.tools'.get_path(modname)
-
 local setmetatable = setmetatable
 local ipairs = ipairs
 local type = type

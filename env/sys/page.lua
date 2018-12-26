@@ -13,12 +13,9 @@ local modname = ...
 _G[modname] = M
 package.loaded[modname] = M
 
-local tools = require 'sys.tools'
-local rpath,path = tools.get_path(modname)
-local lowerRequire = tools.get_lowerRequire()
 
-local dlgPages = lowerRequire (rpath .. 'page.dlg')
-local sysSetting = require (rpath .. 'setting')
+local dlgPages = require ('sys.page.dlg')
+local sysSetting = require ('sys.setting')
 
 local print = print
 local type = type

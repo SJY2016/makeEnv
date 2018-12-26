@@ -98,24 +98,7 @@ return {
 	size = 39
 };
 ]]
-function file_info(file)
-	-- return LFS.get_info(file)
-end
 
---[[
-	return {
-		change = attr.modification,--最新数据修改时间
-		status = attr.change,--最新状态改变时间
-		access = attr.access,--最新使用时间
-	} 
-]]
-function file_time(file)
-	-- return LFS.get_time(file)
-end
-
-function file_mtime(file)
-	-- return LFS.get_time(file).change
-end
 
 --剪切文件
 function file_shear(src,dst)

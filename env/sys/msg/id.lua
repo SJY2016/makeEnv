@@ -4,7 +4,11 @@ _G[modname] = _M
 package.loaded[modname] = _M
 
 local msg = require 'sys.msg'
+local sysKeyword = require 'sys.keyword'
+
 local ID = ID
+
+local type = type
 
 _ENV = _M
 
@@ -54,31 +58,33 @@ function set_timer(fun)
 	end
 end
 
-function set_command(fun)
-	local id = get_command_id()
-	commands()[id] = fun;
-	if not RegCommand then 
-		RegCommand = true
-		msg.add('on_command',function()
-			local fun = commands()[id]
-			if  type(fun) == 'function' then 
-				return fun(scene)
-			end
-		end)
+local function init_ids()
+	local ids = {}
+	return function(id,fun)
+	end,function(id)
 	end
 end
 
-function set_frm_command(fun)
-	local id = get_command_id()
-	frm_commands()[id] =fun;
-	if not RegFrmCommand then 
-		RegFrmCommand = true
-		msg.add('frm_on_command',function(id)
-			local fun = frm_commands()[id]
-			if  type(fun) == 'function' then 
-				return fun()
-			end
-		end)
+local Ids = {}
+function map(id,keyword)
+	Ids[id] = keyword
+end
+
+local function run(id,sc)
+	local keyword = Ids[id]
+	if not keyword then return end 
+	local dat = sysKeyword.get_keywordDat(keyword)
+	if type(dat) ~= 'table' then return end 
+	if sc and dat.view then 
+		return dat.action(sc)
+	elseif not sc and dat.frame then 
+		return dat.action()
 	end
 end
+
+msg.add('on_command',run)
+msg.add('frm_on_command',run)
+
+
+-------------------------------------------------------------------------------------------------------
 

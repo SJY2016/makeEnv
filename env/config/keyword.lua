@@ -7,5 +7,10 @@ local keywords = {
 		-- onLoad=  {type = 'function',value ="on_load"}; 
 		onUnload=  {type = 'function',value ="on_unload"}; 
 	};
+	['AP.Menu.NewFile'] = {
+		view = true;
+		frame = true;
+		action = {type = 'function',value ="action.new_file"}
+	};
 }
 return keywords

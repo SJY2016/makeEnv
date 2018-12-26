@@ -416,7 +416,7 @@ package.loaded[modname] = _M
 
 local luazip = require"luazip"
 local lfs = require 'lfs'
-local DISK = DISK
+local DISK = require 'sys.disk'
 
 local next = next
 local remove = os.remove

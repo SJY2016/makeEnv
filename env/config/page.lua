@@ -1,5 +1,5 @@
 local pages =  {
-	width =300;
+	width =200;
 	-- rasterwidth = 200;
 	{
 		tabtitle = 'Browser'; --系统提供的命令字符。

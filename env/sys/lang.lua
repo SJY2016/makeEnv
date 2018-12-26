@@ -45,8 +45,13 @@ function Lang:new(groupName)
 	local t = {}
 	setmetatable(t,self);
 	self.__index = self;
-	t.groupName= groupName
+	--t.groupName= groupName
 	return t
+end
+
+function Lang:change(langVer)
+	-- change_user_ver(langVer)
+	-- self:update()
 end
 
 function Lang:close()
