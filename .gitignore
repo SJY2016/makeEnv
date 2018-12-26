@@ -13,3 +13,5 @@ env/service/
 env/socket/
 env/project/
 *.zip
+env/apcad/
+env/config/
