@@ -60,7 +60,7 @@ package.loaded[modname] = _M
 local sysSetting =  require ('sys.setting')
 local sysMsgId =  require ('sys.msg.id')
 local sysKeyword = require ('sys.keyword')
-local sysDisk = require 'sys.disk'
+local sysRes= require ('sys.res')
 local lfs = require 'lfs'
 
 
@@ -104,69 +104,19 @@ TBSTATE_WRAP  The button is followed by a line break. The button must also have 
 _ENV = _M
 --------------------------------------------------
 
-local Toolbar = {} 
-Class = Toolbar
-
---------------------------------------------------
-local init_toolbarIds;--toolbar 的样式文件
-local update_toolbarIds;
---------------------------------------------------
-
-function Toolbar:new(t)
-	t = t or {}
-	setmetatable(t,self)
-	self.__index = self
-	return t
-end
-
-local function sortKeys(dat)
-	local tempTab = {}
-	for k,v in pairs(dat) do 
-		if type(k) == 'number'  then 
-			tempTab[#tempTab+1] = k
-		end
-	end
-	
-	table.sort(tempTab)
-	return tempTab
-end
---------------------------------------------------
-
-
-
-function update(styleDat)
-	remove_toolbarIds()
-	if type(styleDat) ~= 'table' or #styleDat == 0 then return end 
-	for _,toolbar in ipairs(styleDat) do 
-		if type(toolbar) == 'table' then 
-			self:create_toolbar(toolbar)
-		end
-	end
-end
-
-
---------------------------------------------------
-
-
-
-function Toolbar:create_toolbar(dat)
-	if not dat or dat.hide then return end 
+function create_toolbar(dat)
 	local btns = {}
 	local id,btnDat,fsStyle;
 	local iconPos = 0 ; 
 	local images = {}
-	
-	local tempTab =dat -- sortKeys(dat)
-	if #tempTab==0 then return end 
-	
-	-- for k,btn in ipairs(dat) do 
-	for k,btn in ipairs(tempTab) do 
-		-- btn = dat[v]
+
+	if #dat==0 then return end 
+
+	for k,btn in ipairs(dat) do 
 		if type(btn) == 'table' and btn.name  then 
 		
 			btnDat = sysKeyword.get_keywordDat(btn.keyword)  or {}
-			local icon =  btn.icon or btnDat.icon
-			
+			local icon =  btn.icon or btnDat.icon or ''
 			images[#images+1] =icon
 			
 			if not btn.hide then 
@@ -188,7 +138,7 @@ function Toolbar:create_toolbar(dat)
 			end
 		end
 	end
-	local bmpname = resource:get_toolbarBmpname{name = dat.name or ('toolbar' .. pos),icons = images,}
+	local bmpname = sysRes.get_toolbarBmpname{file = dat.bmpfile or 'res/toolbar.bmp',icons = images,}
 	
 	local id = sysMsgId.get_command_id()
 	add_toolbarId(id)
@@ -200,7 +150,7 @@ function Toolbar:create_toolbar(dat)
 	})
 end
 
-init_toolbarIds = function()
+local init_toolbarIds = function()
 	local toolbarIds = {};
 	return function()
 		for k,v in ipairs (toolbarIds) do 
@@ -214,112 +164,13 @@ init_toolbarIds = function()
 end
 remove_toolbarIds,add_toolbarId = init_toolbarIds()
 
---[==[
---------------------------------------------------
---plugin toolbar 协议
---arg = {name = ,dat=}
-function Toolbar:plugin_install(arg)
-	local dat = arg.dat and arg.dat.toolbar 
-	if type(dat) ~= 'table' then return end 
-	local name = dat.name
-	local plugin = arg.name
-	local btns = dat.btns 
-	
-	local styleDat = style:get() or {}
-	local positionLin= #styleDat + 1
-	--[[
-	if dat.position then 
-		local lin,col =  string.match(dat.position,'(%d+):(%d+)') 
-		positionLin = lin and tonumber(lin) or positionLin
-		positionCol = col and tonumber(col) or positionCol
-		if positionLin == 0 then 	
-			table.insert(styleDat,1,{name = name,plugin = plugin})
-			positionLin = 1
+function create(styleDat)
+	remove_toolbarIds()
+	if type(styleDat) ~= 'table' or #styleDat == 0 then return end 
+	for _,toolbar in ipairs(styleDat) do 
+		if type(toolbar) == 'table' then 
+			create_toolbar(toolbar)
 		end
-		positionCol = positionCol == 0 and 1 or positionCol
-	end
-	--]]
-	for k,v in ipairs(styleDat) do 
-		if v.name ==  dat.name then 
-			positionLin = k
-			break;
-		end
-	end
-	
-	styleDat[positionLin] = styleDat[positionLin] or {name = name,plugin = plugin}
-	local insertLinDat = styleDat[positionLin]
-	for k,btn in ipairs(btns) do 
-		
-		if type(btn) == 'table'then 
-			btn.plugin = plugin
-		else 
-			btn = {plugin = plugin}
-		end
-		insertLinDat[#insertLinDat+1] = btn
-	--	if insertLinDat[positionCol]  then 
-	--		table.insert(insertLinDat,positionCol,btn)
-	--	else 
-	--		insertLinDat[positionCol] = btn
-	--	end
-	--	positionCol = positionCol+ 1
-	end
-	
-	return style:save(styleDat)
-end
-
-function Toolbar:plugin_uninstall(name)
-	local styleDat = style:get() or {}
-	local newDat = {}
-	
-	local curLin = 0
-	for k,v in ipairs(styleDat) do  
-		local t,curCol = {},0;
-		for m,n in ipairs(v) do 
-			if not n.plugin or n.plugin ~= name then 
-				curCol = curCol + 1
-				t[curCol] = n
-			end
-		end
-		
-		if #t ~= 0 or (not v.plugin)  or (v.plugin and v.plugin ~= name) then 
-			for m,n in pairs(v) do 
-				if type(m) ~= 'number' then 
-					t[m] = n
-				end
-			end
-			curLin = curLin + 1
-			newDat[curLin] = t
-		end
-		-- end
-	end
-	style:save(newDat)
-end
-
---arg = { name,--status,--dat,}
---缺省为install
-function Toolbar:reg_pluginUpdateCbf(arg)
-	assert(type(arg) == 'table')
-	if arg.status and arg.status == 'uninstall' then 
-		self:plugin_uninstall(arg.name)
-	else 
-		self:plugin_install{name = arg.name,dat = arg.dat}
 	end
 end
-
-
--- plugin:reg_cbf(Toolbar.update_plugin)
-
---------------------------------------------------
-
---
-
-
-
-lang:reg_update(
-	function()
-		local toolbar = Class:new()
-		toolbar:update()
-	end
-)
-
---]==]
+sysSetting.reg_cbf('toolbar',create)

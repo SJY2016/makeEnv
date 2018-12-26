@@ -38,114 +38,41 @@ local remove = os.remove
 
 _ENV = _M
 
-
-
-local defaultSize = 16
-
---------------------------------------------------------------------
--- local make_toolbarBmpfile;
---------------------------------------------------------------------
-
-local Res = {}
-Class =Res
-
-function Res:new(t)
-	t = t or {}
-	setmetatable(t,self)
-	self.__index = self
-	return t
-end
-
---arg = {name,icons,--size=,}
-function Res:get_toolbarBmpname(arg)
-	local size = arg.size or defaultSize
-	local name = arg.name or 'toolbar'
-	local dstFile =  toolbarUserPath  .. name .. toolbarDefaultFileType
-	self:make_toolbarBmpfile{dstFile =dstFile,iconPath =toolbarDefaultPath .. size .. '/',icons =  arg.icons,name = name}
+--arg = {bmpfile,icons,}
+function get_toolbarBmpname(arg)
+	local dstFile = arg.bmpfile
+	make_toolbarBmpfile{dstFile =dstFile,icons =  arg.icons}
 	return dstFile
 end
 
-function Res:get_defaultBmp()
+function get_defaultBmp()
 	return 'default.bmp'
 end
 
-function Res:get_toolbarDefaultBmp(size)
-	size = size or defaultSize
-	return toolbarDefaultPath  .. size.. '/default.bmp'
-end
-
-function Res:get_toolbarBtnNameIcon(name,size)
-	size = size or defaultSize
-	return toolbarDefaultPath .. size .. '/' .. name
-end
-
-function Res:init_createBmpStatus(status)
-	self.createBmp = status
-	--可以考虑将toolbar中的图片完全删除
-end
-
-function Res:clear_toolbarBmps()
-	local path = toolbarUserPath
-	for line in lfs.dir(path) do 
-		if line ~= '.' and line ~= '..' then 
-			local file = path .. line
-			if string.match(line , '%.bmp') and lfs.attributes(file,'mode') == 'file' then 
-				remove(file)
-			end
-		end
-	end
-end
-
-function Res:get_toolbarDefaultPath()
-	return toolbarDefaultPath .. defaultSize .. '/'
-end
-
---val = {plugin = ,icon = }
-function Res:get_pluginIcon(val)
-	local file = objPlugin:get_installedPluginPath(val.plugin) .. val.icon
-	if not sysDisk.file_exist(file)  then 
-		file = self:get_toolbarDefaultPath() .. val.icon
-	end
-	return file
-end
-
--------------------------------------------------------------------
+------------------------------------------------------------------
 --
 save_bmpImage = function(file)
 	local image = iup.LoadImage(file)
 	iup.SaveImage(image,file, 'BMP')
 end
 
---arg = {dstFile = ,iconPath = ,icons = }
+
+--arg = {dstFile = ,icons = }
 function make_toolbarBmpfile(arg)
 	
-	if sysDisk.file_exist(arg.dstFile) and not self.createBmp then return end  
+	if sysDisk.file_exist(arg.dstFile)  then return end  
 	local bmps = {}
 	local str = 'convert +append '
-
-	if sysDisk.file_exist(arg.dstFile) then 
-		remove(arg.dstFile)
-	end
-	
-	
+	local file;
 	for _,val in ipairs(arg.icons) do
-		local file;
-		if type(val) == 'table' and val.plugin then
-			file = self:get_pluginIcon(val)
-		elseif type(val) == 'string' then 
-			if string.find(val,'/') then 
-				file = val
-			else 
-				file = arg.iconPath .. val
-			end	
+		if type(val) == 'string' and val ~= '' and sysDisk.file_exist(val) then 
+			str = str .. ' ' .. '\"' .. val .. '\"'
+		else 
+			str = str .. ' ' .. '\"' .. get_defaultBmp()  .. '\"'
 		end
 		
-		if  not file or not sysDisk.file_exist(file) or not  lfs.attributes(file,'mode') == 'file' then 
-				file = arg.iconPath ..  Res:get_defaultBmp()
-		end
-		str = str .. ' ' .. '\"' .. file .. '\"'
 	end	
-	str = str .. ' ' .. self:get_toolbarDefaultBmp(size)
+	str = str .. ' ' .. get_defaultBmp()
 	str = str .. ' ' .. arg.dstFile
 
 	execute(str)
@@ -153,12 +80,6 @@ function make_toolbarBmpfile(arg)
 	local image = iup.LoadImage(arg.dstFile)
 	if image then 
 		iup.SaveImage(image,arg.dstFile, 'BMP')
-	else 
-		local file = 'cfg/bmp/' .. arg.name .. '.bmp'
-		if not sysDisk.file_exist(file) then 
-			file = 'cfg/bmp/toolbar1.bmp'	
-		end
-		sysDisk.file_copy(file,arg.dstFile)
 	end
 end
 
