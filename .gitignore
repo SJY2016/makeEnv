@@ -15,3 +15,4 @@ env/project/
 *.zip
 env/apcad/
 env/config/
+*.fuben
