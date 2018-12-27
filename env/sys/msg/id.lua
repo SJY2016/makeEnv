@@ -9,6 +9,8 @@ local sysKeyword = require 'sys.keyword'
 local ID = ID
 
 local type = type
+local print = print
+local pairs = pairs
 
 _ENV = _M
 
@@ -80,6 +82,7 @@ local function run(id,sc)
 	elseif not sc and dat.frame then 
 		return dat.action()
 	end
+	
 end
 
 msg.add('on_command',run)
