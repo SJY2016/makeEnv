@@ -133,12 +133,12 @@ function create_toolbar(dat)
 			end
 			iconPos = iconPos + 1;
 		else
-			if #btns ~= 0 and #btns ~=  #tempTab and btns[#btns].fsStyle ~= BTNS_SEP then 
+			if #btns ~= 0 and btns[#btns].fsStyle ~= BTNS_SEP then 
 				btns[#btns+1] = {iString = '',fsStyle = BTNS_SEP,fsState = TBSTATE_ENABLED}
 			end
 		end
 	end
-	local bmpname = sysRes.get_toolbarBmpname{file = dat.bmpfile or 'res/toolbar.bmp',icons = images,}
+	local bmpname = sysRes.get_toolbarBmpname{bmpfile = dat.bmpfile or 'res/toolbar.bmp',icons = images,}
 	
 	local id = sysMsgId.get_command_id()
 	add_toolbarId(id)

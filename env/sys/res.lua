@@ -59,7 +59,6 @@ end
 
 --arg = {dstFile = ,icons = }
 function make_toolbarBmpfile(arg)
-	
 	if sysDisk.file_exist(arg.dstFile)  then return end  
 	local bmps = {}
 	local str = 'convert +append '
