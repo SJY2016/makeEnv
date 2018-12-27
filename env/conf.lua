@@ -6,10 +6,12 @@ local conf = {
 	lang = 'config/lang.lua'; --提供的语言库及当前版本管理。
 	page = 'config/page.lua';--左侧工作区及界面样式配置。
 	menu = 'config/menu.lua';--左侧工作区及界面样式配置。
+	toolbar = 'config/toolbar.lua';
 	loads = { --必须存在
 		'keyword'; --如果有keyword 必须放在第一位
 		'lang';--如果有lang 必须放在第keyword 后，其他界面模块之前
 		'menu';
+		'toolbar';
 		'page';
 	};
 }
