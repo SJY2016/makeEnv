@@ -29,10 +29,10 @@
 		-- shortcut:,待添加
 		-- hotkey:值为strig类型，响应热键消息,待添加
 	leftDlg :
-		onInitDlg
-		onInitDat
-		onLoad
-		onUnload
+		hwnd :参考action，函数需要返回iup 控件对。通常为 iup.frame 、iup.vbox
+		onInit 参考action，初始化数据回调函数
+		onLoad 参考action，加载 hwnd 前函数处理
+		onUnload 参考action，卸载 hwnd 后函数处理。
 数据样式：
 	local keywords = {
 		['Page'] = { --page : left dlg
@@ -91,13 +91,13 @@ local functionKeys = {
 	action = true;
 	hwnd = true;
 	onInit = true;
+	onLoad = true;
 	onUnload = true;
 }
 
 init_keywordDat =  function(dat)
 	keywordDat  = keywordDat or {}
-	local db = dat --sysTools.deepcopy(dat)
-	-- local db = sysTools.deepcopy(dat)
+	local db = dat 
 	for k,keyDat in pairs(db) do 
 		keywordDat[k] = {}
 		setmetatable(keywordDat[k],
