@@ -89,7 +89,9 @@ local keywordDat;
 
 local functionKeys = {
 	action = true;
-	
+	hwnd = true;
+	onInit = true;
+	onUnload = true;
 }
 
 init_keywordDat =  function(dat)
