@@ -6,7 +6,6 @@ package.loaded[modname] = _M
 
 local sysTools = TOOLS
 local rpath,path = sysTools.get_path(modname)
-local sysWorkspace = PAGE
 local frameTree = require (rpath .. 'tree_frame')
 
 _ENV = _M
@@ -27,7 +26,7 @@ function on_init()
 end
 
 function on_unload()
-	sysWorkspace.delete(hwnd)
+
 end
 
 --run
