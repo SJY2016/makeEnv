@@ -12,5 +12,13 @@ local keywords = {
 		frame = true;
 		action = {type = 'function',value ="action.new_file"}
 	};
+	['AP.Toolbar.OpenFile'] = {
+		view = true;
+		frame = true;
+		icon = 'res/save.bmp';
+		action = {type = 'function',value ="action.open_file"}
+	};
+	
+				
 }
 return keywords
