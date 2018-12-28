@@ -16,8 +16,6 @@ local keywords = {
 		frame = true;
 		icon = 'res/save.bmp';
 		action = "browser/action.open_file";
-	};
-	
-				
+	};			
 }
 return keywords
