@@ -67,7 +67,7 @@ get_dlgCloseStatus = dlgPages.get_dlgCloseStatus
 
 
 sysSetting.reg_cbf(
-	'page',
+	'tabBar',
 	function(dat)
 		assert(type(dat) == 'table')
 		local attributes = {}
