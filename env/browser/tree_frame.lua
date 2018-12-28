@@ -6,7 +6,6 @@ package.loaded[modname] = _M
 
 local sysTools = TOOLS
 local rpath,path = sysTools.get_path(modname)
-local upRpath =sysTools.get_upRpath(rpath)
 
 local rmenu = require (rpath .. 'tree_rmenu')
 local action = require (rpath .. 'tree_action')
