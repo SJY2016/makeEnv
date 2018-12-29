@@ -48,7 +48,8 @@ init = function() init_db() end
 
 function update()
 	local dat = get_db()
-	local loads = dat.loads
+	if not dat then return end 
+	local loads = dat.loads or {}
 	for _,mod in ipairs(loads) do 
 		local val = dat[mod]
 		if val and  cbfs[mod] then 
@@ -95,7 +96,7 @@ end
 local function load_db()
 	local db;
 	local function init()
-		db = sysDisk.file_read(file) or {}
+		db = sysDisk.file_read(file)
 		return db
 	end
 	return init,function ()
